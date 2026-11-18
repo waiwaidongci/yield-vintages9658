@@ -1,0 +1,1 @@
+import {esc} from '../../utils/format.js';export const heading=(eyebrow,title,description)=>`<header class="page-heading"><p class="eyebrow">${esc(eyebrow)}</p><h1>${esc(title)}</h1><p>${esc(description)}</p></header>`;

@@ -1,0 +1,2 @@
+import {heading} from '../components/common/header.js';import {report} from '../components/report.js';import {esc} from '../utils/format.js';
+export function overview(c,d){return heading('BUSINESS NOTEBOOK / 01','工作底稿与交付总览',c.caption)+`<div class="overview"><aside class="overview-count"><b>${d.sources.length}</b><p>条业务来源</p><hr><p>${d.policies.length} 个冻结口径版本<br>${d.runs.length} 次核算<br>${d.deliveries.length} 次站内交付</p><p>${esc(c.algorithm)}</p></aside><div>${report(d.runs[0])}</div></div>`}

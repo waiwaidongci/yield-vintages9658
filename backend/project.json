@@ -1,0 +1,49 @@
+{
+  "id": "gb-0049",
+  "direction": "口径版本与透视",
+  "title": "砚泉试制良率口径簿",
+  "slug": "yield-vintages",
+  "algorithm": "版本化良率分母规则、加权汇总与按线/班次差异归因",
+  "entities": "YieldLot / DenominatorPolicy / YieldRun / Approval / DeliverySchedule",
+  "scenario": "试制批次一次通过/返工/报废→冻结口径版本与加权透视→主管复核交付；历史快照不随口径改写",
+  "visual": "质检印章、栗棕朱红",
+  "oracle": "分母规则手算；大批小批汇总不能均值；更新规则旧run不变",
+  "frontend": 18253,
+  "backend": 19253,
+  "db_port": 17753,
+  "database": "MySQL8",
+  "batch": 2,
+  "label": "试制批次",
+  "policy_label": "良率分母版本",
+  "fields": {
+    "period": "日期",
+    "department": "试制线",
+    "shift": "班次",
+    "input": "投入数",
+    "first_pass": "一次通过数",
+    "reworked_good": "返工合格数",
+    "scrap": "报废数"
+  },
+  "example": {
+    "period": "2026-11-17",
+    "department": "试制线A",
+    "shift": "早班",
+    "input": 1000,
+    "first_pass": 850,
+    "reworked_good": 100,
+    "scrap": 50
+  },
+  "policy": {
+    "version": "一次通过-v1",
+    "numerator": "first_pass",
+    "denominator": "input",
+    "description": "一次通过良率；返工仍计入投入分母"
+  },
+  "colors": [
+    "0.94 0.025 68",
+    "0.3 0.06 38",
+    "0.52 0.15 28"
+  ],
+  "caption": "口径版本冻结 · 汇总按分母加权",
+  "unit": "%"
+}
