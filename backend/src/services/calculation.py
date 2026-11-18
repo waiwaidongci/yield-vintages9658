@@ -1,7 +1,12 @@
 from collections import defaultdict
 from src.services.validation import validate_source,validate_policy
-def calculate(sources,policy):
- validate_policy(policy);pivot=defaultdict(lambda:[0,0,0]);rows=[]
+from src.services.formula_engine import evaluate_custom
+def calculate(sources,policy,deadline=None):
+ validate_policy(policy)
+ if policy.get('kind')=='custom':
+  # 三级自定义口径：命名中间量/四则/IF/SUM，20秒预算由 worker 以 deadline 注入
+  return evaluate_custom(sources,policy,deadline=deadline)
+ pivot=defaultdict(lambda:[0,0,0]);rows=[]
  for s in sources:
   validate_source(s);num=s['first_pass'] if policy['numerator']=='first_pass' else s['first_pass']+s['reworked_good'];den=s['input'] if policy['denominator']=='input' else s['input']-s['scrap']
   if den<=0:raise ValueError('口径分母为0：'+s['department']+' '+s['period'])

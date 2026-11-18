@@ -2,8 +2,9 @@ from fastapi import APIRouter,Depends,HTTPException
 from src.config.database import database
 from src.controllers.auth import current,editor,admin
 from src.models.source import Source,Policy,Period
-from src.schemas.requests import DataInput
+from src.schemas.requests import DataInput,TrialInput
 from src.services.source import save_source,save_policy
+from src.services.trial import trial
 from src.services.audit import log
 from src.utils.serialize import row
 router=APIRouter()
@@ -26,3 +27,5 @@ def delete(id:int,db=Depends(database),u=Depends(editor)):
 def policies(db=Depends(database),u=Depends(current)): return [row(x) for x in db.query(Policy).order_by(Policy.id).all()]
 @router.post('/policies')
 def policy(b:DataInput,db=Depends(database),u=Depends(admin)): return row(save_policy(db,u,b.data))
+@router.post('/policies/trial')
+def policy_trial(b:TrialInput,db=Depends(database),u=Depends(editor)): return trial(db,b)

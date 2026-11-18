@@ -1,4 +1,22 @@
-import {heading} from '../components/common/header.js';import {esc} from '../utils/format.js';import {table} from '../components/common/table.js';
-const input=(name,label,value,type='text')=>`<label>${label}<input name="${name}" type="${type}" ${type==='number'?'step="any"':''} value="${esc(value)}" required></label>`;
-const choice=(name,label,options,value)=>`<label>${label}<select name="${name}">${options.map(([v,l])=>`<option value="${v}" ${value===v?'selected':''}>${l}</option>`).join('')}</select></label>`;
-export function policies(c,d){return heading('DEFINITION REGISTER / 03',c.policy_label,'负责人登记新的业务口径版本。历史报告保持提交时快照；相同版本名不可覆盖。')+`<form id="policy-form"><div class="form-grid">${input('version','口径版本名',c.policy.version+'-新版本')}${choice('numerator','良率分子',[['first_pass','一次通过数'],['total_good','一次通过＋返工合格数']],c.policy.numerator)}${choice('denominator','良率分母',[['input','全部投入数'],['non_scrap','投入减报废数']],c.policy.denominator)}${input('description','口径用途与比较说明',c.policy.description)}</div><p class="method">先逐批计算分子分母，再加总求率；不同口径版本必须同时比较定义，不简单平均批次良率。</p><button>登记新版本</button></form><h2>已登记口径</h2>`+table(d.policies.map(p=>({编号:p.id,版本:p.version,业务口径:p.data}))) }
+import {heading} from '../components/common/header.js';
+import {esc} from '../utils/format.js';
+import {table} from '../components/common/table.js';
+import {policyEditor,defaultCustomPolicy} from '../components/policy-editor.js';
+
+export function policies(c,d){
+ const seed=defaultCustomPolicy(c.policy.version);
+ return heading('DEFINITION REGISTER / 03',c.policy_label,'登记三级自定义口径（逐批／线内／全厂）。支持命名中间量、四则、IF 条件与低层 SUM 聚合；件数与比例不可相加，循环引用与越级取值在登记时拒绝。先试算、通过校验才可登记用于报告。历史版本与旧固定口径保留可读。')
+ +`<form id="policy-form">${policyEditor(seed,d.periods,'全部')}</form>
+ <h2>已登记口径（版本只增不改）</h2>`
+ +table(d.policies.map(p=>({
+   编号:p.id,版本:p.version,
+   类型:p.data.kind==='custom'?'三级自定义':'固定分子分母',
+   业务口径:p.data.kind==='custom'?summarizeCustom(p.data):(`${p.data.numerator} / ${p.data.denominator}`),
+   说明:p.data.description||'',
+ })));
+}
+
+function summarizeCustom(data){
+ const parts=Object.entries(data.levels).map(([k,arr])=>`${{lot:'逐批',line:'线内',plant:'全厂'}[k]} ${arr.length}量`);
+ return parts.join('；');
+}
